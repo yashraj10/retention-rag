@@ -12,8 +12,8 @@ try:
 except:
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
 
-GEN_MODEL = "models/gemini-2.0-flash"          # generation
-EVAL_MODEL = "models/gemini-2.0-flash"          # LLM-as-judge
+GEN_MODEL = "models/gemini-2.0-flash-lite"          # generation
+EVAL_MODEL = "models/gemini-2.0-flash-lite"          # LLM-as-judge
 EMBED_MODEL = "models/gemini-embedding-001"       # embeddings (768-d)
 
 # ──────────────────────────────────────────────

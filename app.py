@@ -92,6 +92,10 @@ st.markdown("""
 
     header[data-testid="stHeader"] { background: transparent !important; }
     #MainMenu, footer, [data-testid="stDecoration"] { display: none !important; }
+    [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+    [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+    [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+    [data-testid="stSidebarCollapsedControl"] { display: none !important; }
     .block-container { padding: 2.5rem 3rem 3rem !important; max-width: 960px !important; }
 
     h1, h2, h3, h4, p, li, span, div, label, .stMarkdown {
