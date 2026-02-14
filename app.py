@@ -8,8 +8,28 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 
-from config import DECISION_TWIN_SPEC, TOP_K
+from config import DECISION_TWIN_SPEC, TOP_K, CHROMA_COLLECTION, CHROMA_DB_DIR
 from rag import answer, retrieve
+from pathlib import Path
+import chromadb
+
+# Auto-ingest if ChromaDB is empty
+@st.cache_resource
+def ensure_db():
+    try:
+        db_path = Path(__file__).parent / CHROMA_DB_DIR
+        client = chromadb.PersistentClient(path=str(db_path))
+        col = client.get_collection(CHROMA_COLLECTION)
+        if col.count() > 0:
+            return True
+    except:
+        pass
+    with st.spinner("First run: building knowledge base (2-3 min)..."):
+        from ingest import ingest
+        ingest(reset=True)
+    return True
+
+ensure_db()
 
 # ──────────────────────────────────────────────
 # Page config
