@@ -1,5 +1,5 @@
 """
-rag.py - Retrieval-Augmented Generation engine for the Decision Twin.
+rag.py — Retrieval-Augmented Generation engine for the Decision Twin.
 
 Supports:
     - RAG mode (retrieve + generate)
@@ -30,7 +30,11 @@ genai.configure(api_key=GEMINI_API_KEY)
 # ──────────────────────────────────────────────
 
 def _get_collection():
-    db_path = Path(__file__).parent / CHROMA_DB_DIR
+    # If CHROMA_DB_DIR is absolute (set by app.py for cloud), use directly
+    if Path(CHROMA_DB_DIR).is_absolute():
+        db_path = CHROMA_DB_DIR
+    else:
+        db_path = str(Path(__file__).parent / CHROMA_DB_DIR)
     client = chromadb.PersistentClient(path=str(db_path))
     return client.get_collection(CHROMA_COLLECTION)
 
@@ -74,7 +78,7 @@ def retrieve(query: str, k: int = TOP_K) -> list[dict]:
 # ──────────────────────────────────────────────
 
 def _build_prompt_v1(query: str, context: str = "") -> str:
-    """Simple prompt - minimal structure."""
+    """Simple prompt — minimal structure."""
     actions = "\n".join(f"- {a}" for a in DECISION_TWIN_SPEC["actions"])
     ctx_block = f"\nCONTEXT:\n{context}\n" if context else ""
     return f"""You are a decision twin for: {DECISION_TWIN_SPEC["user"]}.
@@ -96,7 +100,7 @@ Return:
 
 
 def _build_prompt_v2(query: str, context: str = "") -> str:
-    """Structured prompt - constraints, required citations, risks, missing info."""
+    """Structured prompt — constraints, required citations, risks, missing info."""
     actions = "\n".join(f"- {a}" for a in DECISION_TWIN_SPEC["actions"])
     constraints = "\n".join(f"- {c}" for c in DECISION_TWIN_SPEC["constraints"])
     ctx_block = f"\nCONTEXT:\n{context}\n" if context else ""
@@ -143,11 +147,12 @@ def _generate(prompt: str) -> str:
             return response.text
         except Exception as e:
             wait = min(120, 2 ** (attempt + 2))
-            if attempt < 5:
+            if "429" in str(e) or "ResourceExhausted" in str(e):
                 print(f"  Rate limit. Waiting {wait}s... (attempt {attempt+1}/6)")
                 time.sleep(wait)
             else:
-                raise RuntimeError(f"Generation failed after 6 attempts: {e}")
+                raise RuntimeError(f"Generation failed after {attempt+1} attempts: {e}")
+    raise RuntimeError("Generation failed after 6 attempts: rate limit exceeded")
 
 
 # ──────────────────────────────────────────────
