@@ -12,6 +12,7 @@ from config import DECISION_TWIN_SPEC, TOP_K, CHROMA_COLLECTION, CHROMA_DB_DIR
 from rag import answer, retrieve
 from pathlib import Path
 import chromadb
+import json
 
 # Auto-ingest if ChromaDB is empty
 @st.cache_resource
@@ -24,10 +25,26 @@ def ensure_db():
             return True
     except:
         pass
-    with st.spinner("First run: building knowledge base (2-3 min)..."):
-        from ingest import ingest
-        ingest(reset=True)
-    return True
+    json_path = Path(__file__).parent / "kb_export.json"
+    if json_path.exists():
+        with open(json_path) as f:
+            data = json.load(f)
+        db_path = Path(__file__).parent / CHROMA_DB_DIR
+        client = chromadb.PersistentClient(path=str(db_path))
+        col = client.get_or_create_collection(
+            name=CHROMA_COLLECTION,
+            metadata={"hnsw:space": "cosine"},
+        )
+        batch = 100
+        for i in range(0, len(data["ids"]), batch):
+            col.upsert(
+                ids=data["ids"][i:i+batch],
+                documents=data["documents"][i:i+batch],
+                metadatas=data["metadatas"][i:i+batch],
+                embeddings=data["embeddings"][i:i+batch],
+            )
+        return True
+    return False
 
 ensure_db()
 
