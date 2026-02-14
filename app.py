@@ -1,4 +1,4 @@
-"""Streamlit UI — Retention Decision Twin (Professional Edition)."""
+"""Streamlit UI — Retention Decision Twin."""
 
 import streamlit as st
 import json
@@ -59,351 +59,267 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────
-# Custom CSS — Professional Dark Theme
+# Custom CSS — Minimal Light Theme
 # ─────────────────────────────────────────
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
     :root {
-        --bg-primary: #0a0a0b;
-        --bg-secondary: #111113;
-        --bg-card: #16161a;
-        --bg-card-hover: #1c1c21;
-        --border: #232328;
-        --border-accent: #2a2a32;
-        --text-primary: #ececef;
-        --text-secondary: #8b8b96;
-        --text-muted: #5a5a66;
-        --accent: #6c5ce7;
-        --accent-dim: #6c5ce720;
-        --accent-glow: #6c5ce730;
-        --success: #00b894;
-        --success-dim: #00b89415;
-        --warning: #fdcb6e;
-        --tag-bg: #1e1e24;
+        --bg: #ffffff;
+        --bg-subtle: #f8f9fa;
+        --bg-muted: #f1f3f5;
+        --border: #e9ecef;
+        --border-strong: #dee2e6;
+        --text: #1a1a1a;
+        --text-secondary: #495057;
+        --text-muted: #868e96;
+        --text-faint: #adb5bd;
+        --accent: #1a1a1a;
+        --accent-hover: #343a40;
+        --green: #2b8a3e;
+        --green-bg: #ebfbee;
+        --tag-bg: #f1f3f5;
+        --tag-border: #dee2e6;
     }
 
     /* ── Global ── */
-    .stApp, [data-testid="stAppViewContainer"], section[data-testid="stSidebar"] {
-        background-color: var(--bg-primary) !important;
-        font-family: 'DM Sans', -apple-system, sans-serif !important;
+    .stApp, [data-testid="stAppViewContainer"] {
+        background-color: var(--bg) !important;
+        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
+    .stApp { color: var(--text) !important; }
 
-    .stApp { color: var(--text-primary) !important; }
-
-    /* Kill default Streamlit chrome */
     header[data-testid="stHeader"] { background: transparent !important; }
     #MainMenu, footer, [data-testid="stDecoration"] { display: none !important; }
-    .block-container { padding: 2rem 3rem 3rem !important; max-width: 1100px !important; }
+    .block-container { padding: 2.5rem 3rem 3rem !important; max-width: 960px !important; }
 
-    /* ── Typography ── */
     h1, h2, h3, h4, p, li, span, div, label, .stMarkdown {
-        font-family: 'DM Sans', -apple-system, sans-serif !important;
-        color: var(--text-primary) !important;
+        font-family: 'IBM Plex Sans', -apple-system, sans-serif !important;
     }
 
-    /* ── Hero Section ── */
-    .hero-badge {
-        display: inline-flex;
+    /* ── Top Bar ── */
+    .topbar {
+        display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 5px 14px;
-        background: var(--accent-dim);
-        border: 1px solid var(--accent);
-        border-radius: 100px;
-        font-size: 0.72rem;
-        font-weight: 500;
-        color: var(--accent) !important;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        margin-bottom: 16px;
-    }
-    .hero-title {
-        font-size: 2.4rem !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.03em;
-        line-height: 1.15 !important;
-        margin: 0 0 10px !important;
-        color: var(--text-primary) !important;
-    }
-    .hero-sub {
-        font-size: 1.05rem;
-        color: var(--text-secondary) !important;
-        line-height: 1.6;
-        max-width: 620px;
+        justify-content: space-between;
+        padding-bottom: 2rem;
         margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
     }
-
-    /* ── Scenario Cards ── */
-    .scenario-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-        gap: 12px;
-        margin: 1.2rem 0 2rem;
+    .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
-    .scenario-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 16px 18px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        position: relative;
+    .topbar-logo {
+        width: 28px; height: 28px;
+        border-radius: 7px;
+        background: var(--accent);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem; font-weight: 600;
     }
-    .scenario-card:hover {
-        background: var(--bg-card-hover);
-        border-color: var(--accent);
-        box-shadow: 0 0 20px var(--accent-glow);
-        transform: translateY(-1px);
+    .topbar-name {
+        font-size: 0.9rem; font-weight: 600;
+        color: var(--text) !important;
+        letter-spacing: -0.01em;
     }
-    .scenario-card .sc-label {
-        font-size: 0.68rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--accent) !important;
-        margin-bottom: 6px;
-    }
-    .scenario-card .sc-text {
-        font-size: 0.88rem;
-        line-height: 1.5;
-        color: var(--text-secondary) !important;
-    }
-
-    /* ── Input Area ── */
-    .stTextArea textarea {
-        background: var(--bg-card) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 12px !important;
-        color: var(--text-primary) !important;
-        font-family: 'DM Sans', sans-serif !important;
-        font-size: 0.95rem !important;
-        padding: 16px !important;
-        transition: border-color 0.2s ease !important;
-    }
-    .stTextArea textarea:focus {
-        border-color: var(--accent) !important;
-        box-shadow: 0 0 0 2px var(--accent-dim) !important;
-    }
-    .stTextArea textarea::placeholder {
+    .topbar-tags { display: flex; gap: 6px; }
+    .topbar-tag {
+        padding: 3px 10px;
+        background: var(--tag-bg);
+        border: 1px solid var(--tag-border);
+        border-radius: 5px;
+        font-size: 0.7rem;
+        font-family: 'IBM Plex Mono', monospace;
         color: var(--text-muted) !important;
     }
 
+    /* ── Hero ── */
+    .hero-title {
+        font-size: 1.65rem !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.025em;
+        line-height: 1.25 !important;
+        margin: 0 0 8px !important;
+        color: var(--text) !important;
+    }
+    .hero-sub {
+        font-size: 0.95rem;
+        color: var(--text-muted) !important;
+        line-height: 1.6;
+        max-width: 560px;
+        margin-bottom: 2rem;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-faint) !important;
+        margin-bottom: 10px;
+    }
+
+    /* ── Scenario Buttons ── */
+    div[data-testid="stHorizontalBlock"] .stButton > button {
+        background: var(--bg) !important;
+        color: var(--text-secondary) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        font-family: 'IBM Plex Sans', sans-serif !important;
+        font-weight: 400 !important;
+        font-size: 0.82rem !important;
+        padding: 14px 16px !important;
+        text-align: left !important;
+        line-height: 1.5 !important;
+        transition: all 0.15s ease !important;
+        min-height: 90px !important;
+    }
+    div[data-testid="stHorizontalBlock"] .stButton > button:hover {
+        border-color: var(--border-strong) !important;
+        background: var(--bg-subtle) !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    }
+    div[data-testid="stHorizontalBlock"] .stButton > button p {
+        color: var(--text-secondary) !important;
+    }
+    div[data-testid="stHorizontalBlock"] .stButton > button strong {
+        color: var(--text) !important; font-weight: 600 !important;
+    }
+
+    /* ── Input ── */
+    .stTextArea textarea {
+        background: var(--bg) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        color: var(--text) !important;
+        font-family: 'IBM Plex Sans', sans-serif !important;
+        font-size: 0.9rem !important;
+        padding: 14px !important;
+        line-height: 1.6 !important;
+        transition: border-color 0.15s ease !important;
+    }
+    .stTextArea textarea:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 1px var(--accent) !important;
+    }
+    .stTextArea textarea::placeholder { color: var(--text-faint) !important; }
+    .stTextArea label { display: none !important; }
+
     /* ── Primary Button ── */
-    .stButton > button[kind="primary"], .stButton > button {
+    .stButton > button[kind="primary"] {
         background: var(--accent) !important;
         color: #fff !important;
         border: none !important;
-        border-radius: 10px !important;
-        font-family: 'DM Sans', sans-serif !important;
-        font-weight: 600 !important;
-        font-size: 0.92rem !important;
-        padding: 0.65rem 1.6rem !important;
-        letter-spacing: 0.01em;
-        transition: all 0.2s ease !important;
+        border-radius: 7px !important;
+        font-family: 'IBM Plex Sans', sans-serif !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+        padding: 0.55rem 1.4rem !important;
+        transition: all 0.15s ease !important;
     }
-    .stButton > button:hover {
-        background: #5a4bd4 !important;
-        box-shadow: 0 4px 20px var(--accent-glow) !important;
-        transform: translateY(-1px) !important;
-    }
-    .stButton > button:active {
-        transform: translateY(0) !important;
+    .stButton > button[kind="primary"]:hover {
+        background: var(--accent-hover) !important;
     }
 
-    /* ── Result Card ── */
-    .result-container {
-        background: var(--bg-card);
+    /* ── Result ── */
+    .result-card {
+        background: var(--bg-subtle);
         border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 28px 30px;
+        border-radius: 10px;
+        padding: 24px 28px 8px;
         margin-top: 1.5rem;
-        position: relative;
-        overflow: hidden;
-    }
-    .result-container::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, var(--accent), var(--success), var(--accent));
-        background-size: 200% 100%;
-        animation: shimmer 3s ease infinite;
-    }
-    @keyframes shimmer {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
     }
     .result-header {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 18px;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border);
     }
-    .result-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: var(--success-dim);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
+    .result-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--green);
     }
     .result-label {
         font-size: 0.72rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--success) !important;
-    }
-    .result-body {
-        font-size: 0.92rem;
-        line-height: 1.75;
-        color: var(--text-secondary) !important;
-    }
-    .result-body strong, .result-body b {
-        color: var(--text-primary) !important;
-        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--green) !important;
     }
 
-    /* ── Sources Expander ── */
+    /* ── Sources ── */
     .streamlit-expanderHeader {
-        background: var(--bg-card) !important;
+        background: var(--bg-subtle) !important;
         border: 1px solid var(--border) !important;
-        border-radius: 10px !important;
-        font-family: 'DM Sans', sans-serif !important;
-        font-size: 0.85rem !important;
-        color: var(--text-secondary) !important;
+        border-radius: 8px !important;
+        font-size: 0.82rem !important;
+        color: var(--text-muted) !important;
     }
     .streamlit-expanderContent {
-        background: var(--bg-secondary) !important;
+        background: var(--bg) !important;
         border: 1px solid var(--border) !important;
         border-top: none !important;
-        border-radius: 0 0 10px 10px !important;
+        border-radius: 0 0 8px 8px !important;
     }
-
-    /* ── Source Chip ── */
-    .source-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 12px;
-        background: var(--tag-bg);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 0.76rem;
-        font-family: 'JetBrains Mono', monospace;
+    .source-row {
+        display: flex; align-items: baseline; gap: 10px;
+        padding: 6px 0; font-size: 0.8rem;
+    }
+    .source-id {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.73rem;
         color: var(--text-muted) !important;
-        margin: 3px 4px 3px 0;
+        background: var(--tag-bg);
+        padding: 2px 8px; border-radius: 4px;
+        white-space: nowrap;
     }
-    .source-chip .sc-score {
-        color: var(--success) !important;
+    .source-score {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--green) !important;
         font-weight: 500;
     }
-
-    /* ── Config Bar ── */
-    .config-bar {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 12px 18px;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        margin-bottom: 1.2rem;
-        flex-wrap: wrap;
+    .source-domain {
+        font-size: 0.76rem;
+        color: var(--text-faint) !important;
     }
-    .config-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.8rem;
-        color: var(--text-muted) !important;
-    }
-    .config-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--success);
-    }
-    .config-dot.off { background: var(--text-muted); }
 
     /* ── Footer ── */
     .app-footer {
         margin-top: 3rem;
         padding-top: 1.5rem;
         border-top: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 8px;
+        font-size: 0.72rem;
+        color: var(--text-faint) !important;
+        display: flex; align-items: center; justify-content: space-between;
     }
-    .footer-left {
-        font-size: 0.75rem;
-        color: var(--text-muted) !important;
-    }
-    .footer-tags {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
+    .footer-tags { display: flex; gap: 6px; }
     .footer-tag {
-        padding: 3px 10px;
+        padding: 2px 8px;
         background: var(--tag-bg);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        font-size: 0.68rem;
-        font-family: 'JetBrains Mono', monospace;
-        color: var(--text-muted) !important;
+        border-radius: 4px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--text-faint) !important;
     }
 
     /* ── Sidebar ── */
     section[data-testid="stSidebar"] {
-        background: var(--bg-secondary) !important;
+        background: var(--bg-subtle) !important;
         border-right: 1px solid var(--border) !important;
     }
-    section[data-testid="stSidebar"] .stSlider label,
-    section[data-testid="stSidebar"] .stRadio label,
-    section[data-testid="stSidebar"] .stCheckbox label {
-        color: var(--text-secondary) !important;
-        font-size: 0.85rem !important;
-    }
 
-    /* ── Toggle / Radio overrides ── */
-    .stRadio > div { gap: 4px !important; }
-    .stRadio > div > label {
-        background: var(--bg-card) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 8px !important;
-        padding: 8px 14px !important;
-        font-size: 0.82rem !important;
-    }
-
-    /* ── Section Label ── */
-    .section-label {
-        font-size: 0.72rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: var(--text-muted) !important;
-        margin-bottom: 10px;
-    }
-
-    /* ── Divider ── */
-    hr { border-color: var(--border) !important; opacity: 0.5; }
-
-    /* ── Spinner ── */
-    .stSpinner > div { color: var(--text-secondary) !important; }
-
-    /* ── Hide Streamlit label "press enter to apply" etc ── */
-    .stTextArea label { display: none !important; }
-
-    /* ── Make Streamlit elements blend ── */
+    hr { border-color: var(--border) !important; opacity: 0.6; }
+    .stSpinner > div { color: var(--text-muted) !important; }
     [data-testid="stExpander"] { border: none !important; }
-    .stAlert { border-radius: 10px !important; }
+    .stAlert { border-radius: 8px !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -416,8 +332,9 @@ if "query" not in st.session_state:
 if "result" not in st.session_state:
     st.session_state.result = None
 
+
 # ─────────────────────────────────────────
-# Sidebar — Settings
+# Sidebar
 # ─────────────────────────────────────────
 with st.sidebar:
     st.markdown("### Settings")
@@ -429,83 +346,56 @@ with st.sidebar:
     )
     k = st.slider("Chunks to retrieve", 1, 10, TOP_K)
     st.markdown("---")
-    st.markdown(
-        '<p style="font-size:0.75rem;color:#5a5a66;">Knowledge base: 123 chunks from 6 curated retention sources.</p>',
-        unsafe_allow_html=True,
-    )
+    st.caption("Knowledge base: 123 chunks from 6 curated retention strategy articles.")
 
 
 # ─────────────────────────────────────────
-# Hero
+# Top bar
 # ─────────────────────────────────────────
-st.markdown('<div class="hero-badge">◎ RAG-Powered Decision Engine</div>', unsafe_allow_html=True)
-st.markdown('<h1 class="hero-title">Retention Decision Twin</h1>', unsafe_allow_html=True)
-st.markdown(
-    '<p class="hero-sub">Describe a user cohort scenario. Get an evidence-based retention recommendation grounded in curated strategy research.</p>',
-    unsafe_allow_html=True,
-)
-
-# Config bar
-rag_dot = "config-dot" if use_rag else "config-dot off"
+rag_label = "RAG on" if use_rag else "RAG off"
 st.markdown(f"""
-<div class="config-bar">
-    <div class="config-item">
-        <div class="{rag_dot}"></div>
-        RAG {'enabled' if use_rag else 'disabled'}
+<div class="topbar">
+    <div class="topbar-left">
+        <div class="topbar-logo">R</div>
+        <span class="topbar-name">Retention Decision Twin</span>
     </div>
-    <div class="config-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5a5a66" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        Prompt {prompt_version}
-    </div>
-    <div class="config-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5a5a66" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Top-{k} chunks
+    <div class="topbar-tags">
+        <span class="topbar-tag">{rag_label}</span>
+        <span class="topbar-tag">Prompt {prompt_version}</span>
+        <span class="topbar-tag">k={k}</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────
+# Hero
+# ─────────────────────────────────────────
+st.markdown('<h1 class="hero-title">What retention action should you take?</h1>', unsafe_allow_html=True)
+st.markdown(
+    '<p class="hero-sub">Describe a user cohort scenario. The engine retrieves evidence from curated retention research and generates a structured recommendation.</p>',
+    unsafe_allow_html=True,
+)
+
+
+# ─────────────────────────────────────────
 # Example Scenarios
 # ─────────────────────────────────────────
 examples = [
-    {
-        "label": "Engagement Drop",
-        "text": "A cohort has declining weekly engagement and a 10-day inactivity gap. Budget is limited. What should we do?",
-    },
-    {
-        "label": "Onboarding Failure",
-        "text": "New users drop off after their first session. Onboarding completion is only 30%. How do we improve retention?",
-    },
-    {
-        "label": "Power User Decline",
-        "text": "Power users who logged in daily now only come once a week. What's the best re-engagement strategy?",
-    },
-    {
-        "label": "Free Tier Churn",
-        "text": "Free tier users who hit usage limits — 70% churn. How should we intervene before they hit the wall?",
-    },
-    {
-        "label": "Feature Adoption",
-        "text": "We launched a new feature but adoption is 8% after 2 weeks. Users seem unaware of it. What should we do?",
-    },
-    {
-        "label": "Promo Cohort Churn",
-        "text": "Users who signed up during a promo campaign never used the core feature. Churn is high. What should we do?",
-    },
+    {"label": "Engagement drop-off", "text": "A cohort has declining weekly engagement and a 10-day inactivity gap. Budget is limited. What should we do?"},
+    {"label": "Onboarding failure", "text": "New users drop off after their first session. Onboarding completion is only 30%. How do we improve retention?"},
+    {"label": "Power user decline", "text": "Power users who logged in daily now only come once a week. What's the best re-engagement strategy?"},
+    {"label": "Free tier churn", "text": "Free tier users who hit usage limits — 70% churn. How should we intervene before they hit the wall?"},
+    {"label": "Low feature adoption", "text": "We launched a new feature but adoption is 8% after 2 weeks. Users seem unaware of it. What should we do?"},
+    {"label": "Promo cohort churn", "text": "Users who signed up during a promo campaign never used the core feature. Churn is high. What should we do?"},
 ]
 
 st.markdown('<div class="section-label">Example scenarios</div>', unsafe_allow_html=True)
 
 cols = st.columns(3)
 for i, ex in enumerate(examples[:6]):
-    col = cols[i % 3]
-    with col:
-        if st.button(
-            f"**{ex['label']}**\n\n{ex['text'][:80]}...",
-            key=f"ex_{i}",
-            use_container_width=True,
-        ):
+    with cols[i % 3]:
+        if st.button(f"**{ex['label']}**\n\n{ex['text'][:75]}...", key=f"ex_{i}", use_container_width=True):
             st.session_state.query = ex["text"]
             st.session_state.result = None
             st.rerun()
@@ -514,19 +404,17 @@ for i, ex in enumerate(examples[:6]):
 # ─────────────────────────────────────────
 # Input
 # ─────────────────────────────────────────
-st.markdown('<div class="section-label" style="margin-top:1.5rem;">Describe your scenario</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-label" style="margin-top:1.8rem;">Your scenario</div>', unsafe_allow_html=True)
 
 query = st.text_area(
     "scenario",
     value=st.session_state.query,
-    height=120,
-    placeholder="e.g., Users signed up during a promo campaign but never activated the core feature. 60-day churn rate is 45%. Budget for incentives is limited...",
+    height=110,
+    placeholder="e.g., Users signed up during a promo campaign but never activated the core feature. 60-day churn rate is 45%...",
     label_visibility="collapsed",
 )
 
-col_btn, col_space = st.columns([1, 3])
-with col_btn:
-    run = st.button("Generate recommendation", type="primary", use_container_width=True)
+run = st.button("Generate recommendation", type="primary")
 
 
 # ─────────────────────────────────────────
@@ -546,42 +434,37 @@ if run:
             st.session_state.result = result
             st.session_state.query = query
 
+
 # ─────────────────────────────────────────
 # Display Result
 # ─────────────────────────────────────────
 if st.session_state.result:
     result = st.session_state.result
 
-    # Format the answer text with better markdown
-    answer_text = result["answer"].replace("**Recommended Action:**", "### Recommended Action\n").replace("Recommended Action:", "### Recommended Action\n")
-
-    st.markdown(f"""
-    <div class="result-container">
+    st.markdown("""
+    <div class="result-card">
         <div class="result-header">
-            <div class="result-icon">✦</div>
-            <div>
-                <div class="result-label">AI Recommendation</div>
-            </div>
+            <div class="result-dot"></div>
+            <span class="result-label">Recommendation</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Render markdown inside streamlit for proper formatting
-    st.markdown(answer_text)
+    st.markdown(result["answer"])
 
-    # Sources
     if result.get("chunks"):
-        with st.expander(f"View retrieved sources ({len(result['chunks'])} chunks)"):
+        with st.expander(f"Retrieved sources  ·  {len(result['chunks'])} chunks"):
             for c in result["chunks"]:
                 domain = c["ref"].split("/")[2] if "://" in c["ref"] else c["ref"][:40]
                 st.markdown(
-                    f'<div class="source-chip">'
-                    f'<span class="sc-score">{c["score"]:.3f}</span> '
-                    f'{c["chunk_id"]} · {domain}'
+                    f'<div class="source-row">'
+                    f'<span class="source-id">{c["chunk_id"]}</span>'
+                    f'<span class="source-score">{c["score"]:.3f}</span>'
+                    f'<span class="source-domain">{domain}</span>'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
-                st.caption(c["text"][:250] + "...")
+                st.caption(c["text"][:200] + "...")
                 st.markdown("---")
 
 
@@ -590,12 +473,11 @@ if st.session_state.result:
 # ─────────────────────────────────────────
 st.markdown(f"""
 <div class="app-footer">
-    <div class="footer-left">Retention Decision Twin · RAG-powered recommendation engine</div>
+    <span>Retention Decision Twin</span>
     <div class="footer-tags">
         <span class="footer-tag">Gemini 2.0 Flash</span>
         <span class="footer-tag">ChromaDB</span>
         <span class="footer-tag">123 chunks</span>
-        <span class="footer-tag">{'RAG + ' + prompt_version if use_rag else 'No-RAG + ' + prompt_version}</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
