@@ -6,7 +6,11 @@ import os
 # ──────────────────────────────────────────────
 # API  (set via env var or edit here)
 # ──────────────────────────────────────────────
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
+try:
+    import streamlit as st
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+except:
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
 
 GEN_MODEL = "models/gemini-2.0-flash"          # generation
 EVAL_MODEL = "models/gemini-2.0-flash"          # LLM-as-judge
